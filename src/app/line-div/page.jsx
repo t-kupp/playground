@@ -5,9 +5,22 @@ import { useEffect, useState, useRef } from "react";
 export default function LineDiv() {
   const [horLine, setHorLine] = useState(0);
   const [verLine, setVerLine] = useState(0);
-  const [touchedColor, setTouchedColor] = useState("");
-  const cardRefs = useRef([]);
+  const [touchedProduct, setTouchedProduct] = useState({});
+  const [products, setProducts] = useState([]);
+  const productRefs = useRef([]);
 
+  // Fetch product data
+  useEffect(() => {
+    async function getData() {
+      const response = await fetch("https://fakestoreapi.com/products");
+      const data = await response.json();
+      console.log(data);
+      setProducts(data);
+    }
+    getData();
+  }, []);
+
+  // Update mouse and lines positions
   useEffect(() => {
     let currentMouseX = 0;
     let currentMouseY = 0;
@@ -21,7 +34,7 @@ export default function LineDiv() {
 
       // Calculate the actual pixel position of the horizontal line
       const clampedTop = Math.max(
-        100,
+        200,
         Math.min(currentMouseY, window.innerHeight - 100),
       );
 
@@ -39,13 +52,18 @@ export default function LineDiv() {
     };
 
     const checkIntersection = (lineY) => {
-      for (let i = 0; i < cardRefs.current.length; i++) {
-        const card = cardRefs.current[i];
-        if (card) {
-          const rect = card.getBoundingClientRect();
-          // Check if the horizontal line intersects with this card
+      for (let i = 0; i < productRefs.current.length; i++) {
+        const product = productRefs.current[i];
+        if (product) {
+          const rect = product.getBoundingClientRect();
+          // Check if the horizontal line intersects with this product
           if (lineY >= rect.top && lineY <= rect.bottom) {
-            setTouchedColor(cards[i].color);
+            console.log("intersected");
+
+            setTouchedProduct(products[i]);
+            product.classList.add("isActive");
+          } else {
+            product.classList.remove("isActive");
           }
         }
       }
@@ -60,70 +78,93 @@ export default function LineDiv() {
       window.removeEventListener("mousemove", handleMouse);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
-
-  const cards = [
-    { color: "red" },
-    { color: "green" },
-    { color: "blue" },
-    { color: "red" },
-    { color: "green" },
-    { color: "blue" },
-    { color: "red" },
-    { color: "green" },
-    { color: "blue" },
-  ];
+  }, [products]);
 
   return (
-    <div className="flex w-screen justify-end">
-      <div className="pointer-events-none fixed top-0 left-0 h-screen w-screen">
+    <div className="flex min-h-screen w-screen justify-end bg-neutral-300">
+      <div className="fixed top-0 left-0 h-screen w-screen">
         <div className="relative flex h-full w-full">
-          {/* Howl image  */}
-          <img
-            src="/howl.png"
-            className="absolute top-0 left-0 object-cover object-center"
-            style={{
-              width: `clamp(100px, ${verLine}%, 30%)`,
-              height: `clamp(100px, ${horLine}%, (100vh - 100px))`,
-            }}
-            alt="Howl"
-          />
-          {/* Mononoke image  */}
-          <img
-            src="/mononoke.png"
-            className="absolute bottom-0 left-0 object-cover"
-            style={{
-              width: `clamp(100px, ${verLine}%, 30%)`,
-              height: `clamp(100px, (100% - ${horLine}%), (100vh - 100px))`,
-            }}
-            alt="Howl"
-          />
           {/* Horizontal line  */}
           <div
-            className={`absolute h-[1px] w-full bg-black`}
-            style={{ top: `clamp(100px, ${horLine}%, (100vh - 100px))` }}
+            className={`absolute h-[1px] w-full bg-neutral-500`}
+            style={{ top: `clamp(200px, ${horLine}%, (100vh - 100px))` }}
           >
-            <p className="absolute bottom-0 left-1/2">
-              Target square color:{" "}
-              <span className="capitalize">{touchedColor}</span>
-            </p>
+            {touchedProduct.title && (
+              <>
+                <p className="absolute bottom-0 left-1/3 ml-2 max-w-2/5 text-3xl font-semibold">
+                  {touchedProduct.title}
+                </p>
+                <p className="absolute top-0 left-1/3 mt-1 ml-2 text-sm font-semibold">
+                  {touchedProduct.price}€
+                </p>
+              </>
+            )}
           </div>
           {/* Vertical line  */}
           <div
-            className={`absolute h-full w-[1px] bg-black`}
-            style={{ left: `clamp(100px, ${verLine}%, 30%)` }}
+            className={`absolute left-1/3 h-full w-[1px] bg-neutral-500`}
           ></div>
         </div>
+
+        {/* Nav list  */}
+        <nav className="absolute top-0 right-[330px]">
+          <ul className="text-right">
+            <li>
+              <a
+                className="font-extrabold transition-colors hover:text-white"
+                href="/"
+              >
+                Home
+              </a>
+            </li>
+            <li>
+              <a
+                className="font-extrabold transition-colors hover:text-white"
+                href="/"
+              >
+                Profile
+              </a>
+            </li>
+            <li>
+              <a
+                className="font-extrabold transition-colors hover:text-white"
+                href="/"
+              >
+                Cart
+              </a>
+            </li>
+            <li>
+              <a
+                className="font-extrabold transition-colors hover:text-white"
+                href="/"
+              >
+                Help
+              </a>
+            </li>
+          </ul>
+        </nav>
       </div>
-      <ul className="mr-16 flex flex-col gap-16 py-[100px]">
-        {cards.map((card, index) => (
-          <li
-            key={index}
-            ref={(el) => (cardRefs.current[index] = el)}
-            className={`h-32 w-64`}
-            style={{ backgroundColor: `${card.color}` }}
-          ></li>
-        ))}
+
+      {/* Products list  */}
+
+      <ul className="mr-16 flex flex-col">
+        <div className="h-[200px] w-[1px] bg-neutral-500"></div>
+        <div className="flex flex-col gap-12">
+          {products.map((product, index) => (
+            <li
+              key={index}
+              ref={(el) => (productRefs.current[index] = el)}
+              className={`flex h-64 w-64 items-center justify-center border border-white bg-white p-4 grayscale`}
+            >
+              <img
+                src={product.image}
+                className="h-full object-contain"
+                alt=""
+              />
+            </li>
+          ))}
+        </div>
+        <div className="h-[100px] w-[1px] bg-neutral-500"></div>
       </ul>
     </div>
   );
