@@ -34,7 +34,7 @@ export default function LineDiv() {
 
       // Calculate the actual pixel position of the horizontal line
       const clampedTop = Math.max(
-        200,
+        150,
         Math.min(currentMouseY, window.innerHeight - 100),
       );
 
@@ -87,11 +87,11 @@ export default function LineDiv() {
           {/* Horizontal line  */}
           <div
             className={`absolute h-[1px] w-full bg-neutral-500`}
-            style={{ top: `clamp(200px, ${horLine}%, (100vh - 100px))` }}
+            style={{ top: `clamp(150px, ${horLine}%, (100vh - 100px))` }}
           >
             {touchedProduct.title && (
               <>
-                <p className="absolute bottom-0 left-1/3 ml-2 max-w-2/5 text-3xl font-semibold">
+                <p className="absolute bottom-0 left-1/3 ml-2 max-w-1/3 text-3xl font-semibold">
                   {touchedProduct.title}
                 </p>
                 <p className="absolute top-0 left-1/3 mt-1 ml-2 text-sm font-semibold">
@@ -102,12 +102,15 @@ export default function LineDiv() {
           </div>
           {/* Vertical line  */}
           <div
-            className={`absolute left-1/3 h-full w-[1px] bg-neutral-500`}
+            className={`absolute left-[274px] h-full w-[1px] bg-neutral-500`}
           ></div>
         </div>
 
+        {/* Logo  */}
+        <h1 className="logo absolute top-0 left-0 px-1 text-6xl">Fake Store</h1>
+
         {/* Nav list  */}
-        <nav className="absolute top-0 right-[330px]">
+        <nav className="absolute top-0 right-[410px]">
           <ul className="text-right">
             <li>
               <a
@@ -148,19 +151,15 @@ export default function LineDiv() {
       {/* Products list  */}
 
       <ul className="mr-16 flex flex-col">
-        <div className="h-[200px] w-[1px] bg-neutral-500"></div>
+        <div className="h-[150px] w-[1px] bg-neutral-500"></div>
         <div className="flex flex-col gap-12">
           {products.map((product, index) => (
             <li
               key={index}
               ref={(el) => (productRefs.current[index] = el)}
-              className={`flex h-64 w-64 items-center justify-center border border-white bg-white p-4 grayscale`}
+              className={`flex h-48 w-fit border border-white bg-white p-4 grayscale`}
             >
-              <img
-                src={product.image}
-                className="h-full object-contain"
-                alt=""
-              />
+              <img src={product.image} className="h-full object-cover" alt="" />
             </li>
           ))}
         </div>
