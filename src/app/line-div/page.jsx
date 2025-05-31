@@ -58,8 +58,6 @@ export default function LineDiv() {
           const rect = product.getBoundingClientRect();
           // Check if the horizontal line intersects with this product
           if (lineY >= rect.top && lineY <= rect.bottom) {
-            console.log("intersected");
-
             setTouchedProduct(products[i]);
             product.classList.add("isActive");
           } else {
@@ -82,6 +80,10 @@ export default function LineDiv() {
 
   return (
     <div className="flex min-h-screen w-screen justify-end bg-neutral-300">
+      <div
+        className="fixed top-0 left-0 h-screen w-screen opacity-50 brightness-75"
+        style={{ backgroundImage: "url(/paper-texture.jpg)" }}
+      ></div>
       <div className="fixed top-0 left-0 h-screen w-screen">
         <div className="relative flex h-full w-full">
           {/* Horizontal line  */}
@@ -91,6 +93,9 @@ export default function LineDiv() {
           >
             {touchedProduct.title && (
               <>
+                <p className="absolute top-0 right-[calc(100vw-270px)] text-right font-extrabold capitalize">
+                  {touchedProduct.category}
+                </p>
                 <p className="absolute bottom-0 left-1/3 ml-2 max-w-1/3 text-3xl font-semibold">
                   {touchedProduct.title}
                 </p>
@@ -152,14 +157,20 @@ export default function LineDiv() {
 
       <ul className="mr-16 flex flex-col">
         <div className="h-[150px] w-[1px] bg-neutral-500"></div>
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-6">
           {products.map((product, index) => (
             <li
               key={index}
               ref={(el) => (productRefs.current[index] = el)}
-              className={`flex h-48 w-fit border border-white bg-white p-4 grayscale`}
+              className={`flex h-48 w-fit bg-white p-4 grayscale`}
             >
-              <img src={product.image} className="h-full object-cover" alt="" />
+              <a href="" className="h-full">
+                <img
+                  src={product.image}
+                  className="h-full object-cover"
+                  alt=""
+                />
+              </a>
             </li>
           ))}
         </div>
